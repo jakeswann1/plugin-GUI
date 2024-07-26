@@ -27,6 +27,9 @@
 #include <ProcessorHeaders.h>
 
 #include "ChannelMappingNode.h"
+#include <fstream>
+#include <vector>
+#include <string>
 
 class PrbFormat
 {
@@ -34,29 +37,25 @@ public:
 
     static void write(File filename, ChannelMapSettings* settings)
     {
-        FileOutputStream outputStream(filename);
-        outputStream.setPosition(0);
-        outputStream.truncate();
+        // Open the file for writing
+        std::ofstream outputStream(filename.getFullPathName().toStdString());
+        if (!outputStream.is_open()) {
+            std::cerr << "Unable to open file for writing: " << filename.getFullPathName().toStdString() << std::endl;
+            return;
+        }
 
-        DynamicObject info;
-        DynamicObject* nestedObj = new DynamicObject();
+        // Write CSV header
+        outputStream << "mapping,enabled" << std::endl;
 
-        Array<var> arr;
-        Array<var> arr2;
-        
+        // Write channel data
         for (int i = 0; i < settings->channelOrder.size(); i++)
         {
-            arr.add(var(settings->channelOrder[i]));
-            arr2.add(var(settings->isEnabled[i]));
+            outputStream << settings->channelOrder[i] << ","
+                         << settings->isEnabled[i] << std::endl;
         }
-        
-        nestedObj->setProperty("mapping", var(arr));
-        nestedObj->setProperty("enabled", var(arr2));
 
-        info.setProperty("0", nestedObj);
-
-        info.writeAsJSON(outputStream, 2, false, 3);
-        
+        // Close the file
+        outputStream.close();
     }
 
     static void read(File filename, ChannelMapSettings* settings)

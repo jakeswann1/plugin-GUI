@@ -168,7 +168,7 @@ void ChannelMappingEditor::buttonClicked(Button* button)
         {
             FileChooser fc("Choose the file name...",
                                CoreServices::getDefaultUserSaveDirectory(),
-                               "*",
+                               "*.csv",
                                true);
 
             if (fc.browseForFileToSave(true))
